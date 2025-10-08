@@ -4,7 +4,7 @@ const xml2js = require('xml2js');
 
 module.exports = async ({ req, res, log, error }) => {
   const client = new sdk.Client()
-    .setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT)
+    .setEndpoint(process.env.APPWRITE_FUNCTION_ENDPOINT || 'https://cloud.appwrite.io/v1')
     .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
     .setKey(process.env.APPWRITE_API_KEY);
 
@@ -57,6 +57,11 @@ module.exports = async ({ req, res, log, error }) => {
       const rawBody = req.body;
       const signature = req.headers['x-hub-signature'];
 
+      if (!signature) {
+        error('Missing X-Hub-Signature header');
+        return res.text('Forbidden', 403);
+      }
+
       const parser = new xml2js.Parser();
       const parsedXml = await parser.parseStringPromise(rawBody);
 
@@ -89,55 +94,46 @@ module.exports = async ({ req, res, log, error }) => {
       const subscription = subscriptions.documents[0];
       const hubSecret = subscription.hubSecret;
 
-      if (signature) {
-        const expectedSignature = 'sha1=' + crypto
-          .createHmac('sha1', hubSecret)
-          .update(rawBody)
-          .digest('hex');
+      const expectedSignature = 'sha1=' + crypto
+        .createHmac('sha1', hubSecret)
+        .update(rawBody)
+        .digest('hex');
 
-        if (signature !== expectedSignature) {
-          error('Invalid signature');
-          return res.text('Forbidden', 403);
-        }
+      if (signature !== expectedSignature) {
+        error('Invalid signature');
+        return res.text('Forbidden', 403);
       }
 
       const automations = await databases.listDocuments(
         process.env.APPWRITE_DATABASE_ID,
         process.env.APPWRITE_AUTOMATIONS_COLLECTION_ID,
-        [sdk.Query.equal('isActive', true)]
+        [
+          sdk.Query.equal('isActive', true),
+          sdk.Query.equal('userId', subscription.userId),
+          sdk.Query.equal('youtubeConnectionId', subscription.youtubeConnectionId)
+        ]
       );
 
       for (const automation of automations.documents) {
-        const connections = await databases.listDocuments(
-          process.env.APPWRITE_DATABASE_ID,
-          process.env.APPWRITE_CONNECTIONS_COLLECTION_ID,
-          [sdk.Query.equal('$id', automation.youtubeConnectionId)]
-        );
+        try {
+          await functions.createExecution(
+            'distributeMessage',
+            JSON.stringify({
+              userId: automation.userId,
+              messageTemplate: automation.messageTemplate,
+              videoDetails: {
+                videoId,
+                videoTitle,
+                videoUrl: `https://www.youtube.com/watch?v=${videoId}`,
+              },
+              targetConnectionIds: automation.targetConnectionIds,
+            }),
+            false
+          );
 
-        if (connections.documents.length > 0) {
-          const ytConnection = connections.documents[0];
-          if (ytConnection.channelId === channelId) {
-            try {
-              await functions.createExecution(
-                'distributeMessage',
-                JSON.stringify({
-                  userId: automation.userId,
-                  messageTemplate: automation.messageTemplate,
-                  videoDetails: {
-                    videoId,
-                    videoTitle,
-                    videoUrl: `https://www.youtube.com/watch?v=${videoId}`,
-                  },
-                  targetConnectionIds: automation.targetConnectionIds,
-                }),
-                false
-              );
-
-              log(`Triggered distribution for automation ${automation.$id}`);
-            } catch (execError) {
-              error('Execution error:', execError.message);
-            }
-          }
+          log(`Triggered distribution for automation ${automation.$id}`);
+        } catch (execError) {
+          error('Execution error:', execError.message);
         }
       }
 

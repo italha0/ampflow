@@ -4,21 +4,21 @@ const crypto = require('crypto');
 
 module.exports = async ({ req, res, log, error }) => {
   const client = new sdk.Client()
-    .setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT)
+    .setEndpoint(process.env.APPWRITE_FUNCTION_ENDPOINT || 'https://cloud.appwrite.io/v1')
     .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
     .setKey(process.env.APPWRITE_API_KEY);
 
   const databases = new sdk.Databases(client);
 
   try {
-    const { userId, youtubeChannelId } = JSON.parse(req.body);
+    const { userId, youtubeChannelId, youtubeConnectionId } = JSON.parse(req.body);
 
-    if (!userId || !youtubeChannelId) {
+    if (!userId || !youtubeChannelId || !youtubeConnectionId) {
       return res.json({ success: false, message: 'Missing required fields' }, 400);
     }
 
     const hubSecret = crypto.randomBytes(32).toString('hex');
-    const callbackUrl = `${process.env.APPWRITE_FUNCTION_PROJECT_ENDPOINT}/functions/youtubeWebhook/executions`;
+    const callbackUrl = `${process.env.APPWRITE_FUNCTION_ENDPOINT}/functions/youtubeWebhook/executions`;
     const hubTopic = `https://www.youtube.com/xml/feeds/videos.xml?channel_id=${youtubeChannelId}`;
 
     try {
@@ -46,7 +46,9 @@ module.exports = async ({ req, res, log, error }) => {
         process.env.APPWRITE_YOUTUBE_SUBSCRIPTIONS_COLLECTION_ID,
         sdk.ID.unique(),
         {
+          userId,
           youtubeChannelId,
+          youtubeConnectionId,
           callbackUrl,
           hubSecret,
           status: 'pending',

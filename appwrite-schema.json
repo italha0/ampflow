@@ -131,12 +131,24 @@
       "name": "youtubeSubscriptions",
       "id": "youtubeSubscriptions",
       "permissions": {
-        "read": ["any"],
-        "write": ["any"]
+        "read": [],
+        "write": []
       },
       "attributes": [
         {
+          "key": "userId",
+          "type": "string",
+          "required": true,
+          "size": 255
+        },
+        {
           "key": "youtubeChannelId",
+          "type": "string",
+          "required": true,
+          "size": 255
+        },
+        {
+          "key": "youtubeConnectionId",
           "type": "string",
           "required": true,
           "size": 255

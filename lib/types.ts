@@ -25,7 +25,9 @@ export interface Automation {
 
 export interface YouTubeSubscription {
   $id: string;
+  userId: string;
   youtubeChannelId: string;
+  youtubeConnectionId: string;
   callbackUrl: string;
   hubSecret: string;
   status: 'pending' | 'subscribed' | 'unsubscribed';
