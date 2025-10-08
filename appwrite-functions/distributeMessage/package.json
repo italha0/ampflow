@@ -1,0 +1,10 @@
+{
+  "name": "distribute-message",
+  "version": "1.0.0",
+  "description": "Distribute messages to Discord, Telegram, and Whop",
+  "main": "index.js",
+  "dependencies": {
+    "node-appwrite": "^13.0.0",
+    "axios": "^1.7.9"
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "collections": [
+    {
+      "name": "connections",
+      "id": "connections",
+      "permissions": {
+        "read": ["user:{userId}"],
+        "write": ["user:{userId}"]
+      },
+      "attributes": [
+        {
+          "key": "userId",
+          "type": "string",
+          "required": true,
+          "size": 255
+        },
+        {
+          "key": "platform",
+          "type": "string",
+          "required": true,
+          "size": 50,
+          "array": false
+        },
+        {
+          "key": "username",
+          "type": "string",
+          "required": false,
+          "size": 255
+        },
+        {
+          "key": "channelId",
+          "type": "string",
+          "required": false,
+          "size": 255
+        },
+        {
+          "key": "accessToken",
+          "type": "string",
+          "required": false,
+          "size": 1000,
+          "encrypted": true
+        },
+        {
+          "key": "refreshToken",
+          "type": "string",
+          "required": false,
+          "size": 1000,
+          "encrypted": true
+        },
+        {
+          "key": "botToken",
+          "type": "string",
+          "required": false,
+          "size": 1000,
+          "encrypted": true
+        },
+        {
+          "key": "guildId",
+          "type": "string",
+          "required": false,
+          "size": 255
+        }
+      ],
+      "indexes": [
+        {
+          "key": "userId_idx",
+          "type": "key",
+          "attributes": ["userId"]
+        },
+        {
+          "key": "platform_idx",
+          "type": "key",
+          "attributes": ["platform"]
+        }
+      ]
+    },
+    {
+      "name": "automations",
+      "id": "automations",
+      "permissions": {
+        "read": ["user:{userId}"],
+        "write": ["user:{userId}"]
+      },
+      "attributes": [
+        {
+          "key": "userId",
+          "type": "string",
+          "required": true,
+          "size": 255
+        },
+        {
+          "key": "youtubeConnectionId",
+          "type": "string",
+          "required": true,
+          "size": 255
+        },
+        {
+          "key": "targetConnectionIds",
+          "type": "string",
+          "required": true,
+          "array": true,
+          "size": 255
+        },
+        {
+          "key": "messageTemplate",
+          "type": "string",
+          "required": true,
+          "size": 5000
+        },
+        {
+          "key": "isActive",
+          "type": "boolean",
+          "required": true,
+          "default": false
+        }
+      ],
+      "indexes": [
+        {
+          "key": "userId_idx",
+          "type": "key",
+          "attributes": ["userId"]
+        },
+        {
+          "key": "active_idx",
+          "type": "key",
+          "attributes": ["isActive"]
+        }
+      ]
+    },
+    {
+      "name": "youtubeSubscriptions",
+      "id": "youtubeSubscriptions",
+      "permissions": {
+        "read": ["any"],
+        "write": ["any"]
+      },
+      "attributes": [
+        {
+          "key": "youtubeChannelId",
+          "type": "string",
+          "required": true,
+          "size": 255
+        },
+        {
+          "key": "callbackUrl",
+          "type": "string",
+          "required": true,
+          "size": 500
+        },
+        {
+          "key": "hubSecret",
+          "type": "string",
+          "required": true,
+          "size": 500,
+          "encrypted": true
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true,
+          "size": 50,
+          "default": "pending"
+        },
+        {
+          "key": "expiryDate",
+          "type": "string",
+          "required": true,
+          "size": 100
+        }
+      ],
+      "indexes": [
+        {
+          "key": "channelId_idx",
+          "type": "unique",
+          "attributes": ["youtubeChannelId"]
+        },
+        {
+          "key": "status_idx",
+          "type": "key",
+          "attributes": ["status"]
+        }
+      ]
+    }
+  ]
+}
