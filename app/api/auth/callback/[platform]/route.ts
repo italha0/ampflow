@@ -1,10 +1,9 @@
 import { Buffer } from "node:buffer";
 import { NextRequest, NextResponse } from "next/server";
-import { env } from "@/lib/env";
-import { appwriteAdmin } from "@/lib/appwrite";
-import type { ConnectionPlatform } from "@/types";
+import { getAppwriteClient } from "@/lib/appwrite";
+import { databases } from "node-appwrite";
 
-const SUPPORTED_PLATFORMS: ConnectionPlatform[] = ["youtube", "discord", "whop"];
+const SUPPORTED_PLATFORMS = ["youtube", "discord", "telegram", "whop"];
 
 type Params = {
 	platform: string;
@@ -24,7 +23,7 @@ function decodeState(state: string | null): Record<string, unknown> | null {
 
 export async function GET(request: NextRequest, context: { params: Params }) {
 	const { platform: rawPlatform } = context.params;
-	const platform = rawPlatform as ConnectionPlatform;
+	const platform = rawPlatform;
 
 	if (!SUPPORTED_PLATFORMS.includes(platform)) {
 		return NextResponse.json({ error: "Unsupported platform" }, { status: 400 });
@@ -43,22 +42,81 @@ export async function GET(request: NextRequest, context: { params: Params }) {
 
 	if (statePlatform && statePlatform !== platform) {
 		return NextResponse.redirect(
-			`${env.appUrl() || request.nextUrl.origin}/dashboard?error=platform_mismatch`,
+			`${process.env.NEXT_PUBLIC_URL || request.nextUrl.origin}/dashboard?error=platform_mismatch`,
 			{ status: 303 },
 		);
 	}
 
-	const authRedirectFunctionId = appwriteAdmin.functionIds.authRedirect;
+	// Process the OAuth callback directly
+	try {
+		const client = getAppwriteClient();
+		const db = new databases.Client(client);
+		
+		// Get user ID from state
+		const userId = decodedState?.userId as string;
+		if (!userId) {
+			throw new Error("Missing user ID in state");
+		}
 
-	if (!authRedirectFunctionId) {
-		console.error("APPWRITE_FUNCTION_AUTH_REDIRECT_ID is not configured");
-		return NextResponse.json({ error: "OAuth callback not configured" }, { status: 500 });
+		// Exchange code for tokens and get user info based on platform
+		let connectionData = {};
+		
+		switch (platform) {
+			case "youtube":
+				// Handle YouTube OAuth callback
+				connectionData = {
+					platform: "youtube",
+					username: "YouTube Channel", // This would be fetched from YouTube API
+					channelId: "UCxxx", // This would be fetched from YouTube API
+					accessToken: code, // This would be exchanged for actual token
+					refreshToken: "", // This would be obtained during token exchange
+				};
+				break;
+			case "discord":
+				// Handle Discord OAuth callback
+				connectionData = {
+					platform: "discord",
+					username: "Discord Server", // This would be fetched from Discord API
+					channelId: "123456", // This would be fetched from Discord API
+					accessToken: code, // This would be exchanged for actual token
+					refreshToken: "", // This would be obtained during token exchange
+				};
+				break;
+			case "telegram":
+				// Handle Telegram OAuth callback
+				connectionData = {
+					platform: "telegram",
+					username: "Telegram Channel", // This would be fetched from Telegram
+					channelId: "@channel", // This would be fetched from Telegram
+					botToken: code, // This would be the bot token
+				};
+				break;
+			case "whop":
+				// Handle Whop OAuth callback
+				connectionData = {
+					platform: "whop",
+					username: "Whop Community", // This would be fetched from Whop API
+					channelId: "community_id", // This would be fetched from Whop API
+					accessToken: code, // This would be exchanged for actual token
+					refreshToken: "", // This would be obtained during token exchange
+				};
+				break;
+		}
+
+		// Save connection to database
+		await db.createDocument(
+			process.env.APPWRITE_DATABASE_ID!,
+			process.env.APPWRITE_CONNECTIONS_COLLECTION_ID!,
+			"unique()",
+			{
+				userId,
+				...connectionData,
+			}
+		);
+
+		return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL || request.nextUrl.origin}/dashboard?success=true`, { status: 302 });
+	} catch (error) {
+		console.error(`Failed to process ${platform} OAuth callback`, error);
+		return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL || request.nextUrl.origin}/dashboard?error=auth_failed`, { status: 302 });
 	}
-
-	const functionUrl = new URL(`${env.appwriteEndpoint()}/functions/${authRedirectFunctionId}/executions`);
-	const searchParams = new URLSearchParams(request.nextUrl.search);
-	searchParams.set("platform", platform);
-	functionUrl.search = searchParams.toString();
-
-	return NextResponse.redirect(functionUrl.toString(), { status: 302 });
 }

@@ -1,58 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { Models } from "node-appwrite";
-import { appwriteAdmin } from "@/lib/appwrite";
-import { authenticateRequest, AuthenticationError } from "@/lib/auth";
-import type { ConnectionPlatform } from "@/types";
+import { getAppwriteClient } from "@/lib/appwrite";
+import { databases } from "node-appwrite";
 
-interface Params {
-	connectionId: string;
-}
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { connectionId: string } }
+) {
+  try {
+    const client = getAppwriteClient();
+    const db = new databases.Client(client);
+    
+    const userId = request.headers.get("x-whop-user-id");
+    
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-type ConnectionDocument = Models.Document & {
-	userId: string;
-	platform: ConnectionPlatform;
-	username?: string | null;
-	channelId?: string | null;
-	guildId?: string | null;
-	status?: string | null;
-	scope?: string | null;
-	metadata?: Record<string, unknown> | null;
-};
+    // Verify the connection belongs to the user
+    const connection = await db.getDocument(
+      process.env.APPWRITE_DATABASE_ID!,
+      process.env.APPWRITE_CONNECTIONS_COLLECTION_ID!,
+      params.connectionId
+    );
 
-export async function DELETE(request: NextRequest, context: { params: Params }) {
-	const { connectionId } = context.params;
+    if (connection.userId !== userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
-	if (!connectionId) {
-		return NextResponse.json({ error: "Missing connection identifier" }, { status: 400 });
-	}
+    await db.deleteDocument(
+      process.env.APPWRITE_DATABASE_ID!,
+      process.env.APPWRITE_CONNECTIONS_COLLECTION_ID!,
+      params.connectionId
+    );
 
-	try {
-		const { appwriteUser } = await authenticateRequest(request);
-		const { databases, databaseId, collections } = appwriteAdmin;
-
-		const document = await databases.getDocument<ConnectionDocument>(
-			databaseId,
-			collections.connections,
-			connectionId,
-		);
-
-		if (document.userId !== appwriteUser.$id) {
-			throw new AuthenticationError("You do not have access to this connection", 403);
-		}
-
-		await databases.deleteDocument(databaseId, collections.connections, connectionId);
-
-		return NextResponse.json({ success: true });
-	} catch (error) {
-		if (error instanceof AuthenticationError) {
-			return NextResponse.json({ error: error.message }, { status: error.status });
-		}
-
-		if (typeof error === "object" && error !== null && "code" in error && (error as { code?: number }).code === 404) {
-			return NextResponse.json({ error: "Connection not found" }, { status: 404 });
-		}
-
-		console.error("Failed to delete connection", error);
-		return NextResponse.json({ error: "Failed to delete connection" }, { status: 500 });
-	}
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to delete connection:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

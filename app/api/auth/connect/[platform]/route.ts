@@ -1,12 +1,10 @@
 import { Buffer } from "node:buffer";
 import { randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateRequest, AuthenticationError } from "@/lib/auth";
-import { env } from "@/lib/env";
-import type { ConnectionPlatform } from "@/types";
+import { getAppwriteClient } from "@/lib/appwrite";
 
 interface Params {
-	platform: ConnectionPlatform;
+	platform: string;
 }
 
 interface ProviderConfig {
@@ -25,13 +23,13 @@ function encodeState(payload: Record<string, unknown>) {
 		.replace(/=+$/, "");
 }
 
-function resolveProviderConfig(platform: ConnectionPlatform): ProviderConfig | null {
+function resolveProviderConfig(platform: string): ProviderConfig | null {
 	switch (platform) {
 		case "youtube":
 			return {
 				authorizeUrl: "https://accounts.google.com/o/oauth2/v2/auth",
-				clientId: env.youtubeClientId(),
-				redirectUri: env.youtubeRedirectUri(),
+				clientId: process.env.YOUTUBE_CLIENT_ID,
+				redirectUri: `${process.env.NEXT_PUBLIC_URL}/api/auth/callback/youtube`,
 				scope: "https://www.googleapis.com/auth/youtube.readonly",
 				extraParams: {
 					access_type: "offline",
@@ -42,18 +40,25 @@ function resolveProviderConfig(platform: ConnectionPlatform): ProviderConfig | n
 		case "discord":
 			return {
 				authorizeUrl: "https://discord.com/api/oauth2/authorize",
-				clientId: env.discordClientId(),
-				redirectUri: env.discordRedirectUri(),
+				clientId: process.env.DISCORD_CLIENT_ID,
+				redirectUri: `${process.env.NEXT_PUBLIC_URL}/api/auth/callback/discord`,
 				scope: "identify guilds",
 				extraParams: {
 					response_type: "code",
 				},
 			};
+		case "telegram":
+			return {
+				authorizeUrl: "https://oauth.telegram.org/auth",
+				clientId: process.env.TELEGRAM_BOT_NAME,
+				redirectUri: `${process.env.NEXT_PUBLIC_URL}/api/auth/callback/telegram`,
+				scope: "",
+			};
 		case "whop":
 			return {
 				authorizeUrl: "https://whop.com/oauth/authorize",
-				clientId: env.whopClientId(),
-				redirectUri: env.whopRedirectUri(),
+				clientId: process.env.WHOP_CLIENT_ID,
+				redirectUri: `${process.env.NEXT_PUBLIC_URL}/api/auth/callback/whop`,
 				scope: "read:profile read:communities",
 			};
 		default:
@@ -68,12 +73,12 @@ export async function GET(request: NextRequest, context: { params: Params }) {
 		return NextResponse.json({ error: "Missing platform" }, { status: 400 });
 	}
 
-	if (platform === "telegram") {
-		return NextResponse.json({ error: "Telegram connections are not yet supported" }, { status: 501 });
-	}
-
 	try {
-		const { appwriteUser } = await authenticateRequest(request);
+		const userId = request.headers.get("x-whop-user-id");
+		if (!userId) {
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		}
+
 		const config = resolveProviderConfig(platform);
 
 		if (!config) {
@@ -86,11 +91,10 @@ export async function GET(request: NextRequest, context: { params: Params }) {
 			return NextResponse.json({ error: "OAuth client configuration missing" }, { status: 500 });
 		}
 
-		const redirectUrl =
-			request.nextUrl.searchParams.get("redirectUrl") ?? `${env.appUrl() || request.nextUrl.origin}/dashboard`;
+		const redirectUrl = `${process.env.NEXT_PUBLIC_URL || request.nextUrl.origin}/dashboard`;
 
 		const state = encodeState({
-			userId: appwriteUser.$id,
+			userId: userId,
 			platform,
 			redirectUrl,
 			nonce: randomBytes(12).toString("hex"),
@@ -111,10 +115,6 @@ export async function GET(request: NextRequest, context: { params: Params }) {
 
 		return NextResponse.redirect(url.toString(), { status: 302 });
 	} catch (error) {
-		if (error instanceof AuthenticationError) {
-			return NextResponse.json({ error: error.message }, { status: error.status });
-		}
-
 		console.error(`Failed to initiate ${platform} OAuth`, error);
 		return NextResponse.json({ error: "Failed to initiate OAuth flow" }, { status: 500 });
 	}

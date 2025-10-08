@@ -19,7 +19,8 @@
 			}
 		],
 		"paths": {
-			"@/*": ["./*"]
+			"@/*": ["./*"],
+			"@whop-apps/nextjs": ["./lib/whop-apps-nextjs/index.ts"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -20,8 +20,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-	title: "Whop App",
-	description: "My Whop App",
+	title: "AmpFlow - Automated Content Distribution",
+	description: "Automatically distribute your YouTube content to Discord, Telegram, and Whop communities",
 };
 
 export default function RootLayout({

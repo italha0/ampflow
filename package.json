@@ -1,6 +1,6 @@
 {
-	"name": "whop-nextjs-app-template",
-	"version": "0.1.0",
+	"name": "ampflow",
+	"version": "1.0.0",
 	"private": true,
 	"scripts": {
 		"dev": "whop-proxy --command \"next dev\"",
@@ -17,12 +17,14 @@
 		"appwrite": "^21.0.0",
 		"axios": "^1.12.2",
 		"clsx": "^2.1.1",
+		"crypto": "^1.0.1",
 		"luxon": "^3.7.2",
 		"next": "15.3.2",
 		"node-appwrite": "^20.0.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"tailwind-merge": "^3.3.1",
+		"xml2js": "^0.6.2",
 		"zustand": "^5.0.8"
 	},
 	"devDependencies": {
