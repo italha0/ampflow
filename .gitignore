@@ -1,1 +1,47 @@
-node_modules
+# Dependencies
+node_modules/
+.pnp.cjs
+.pnp.loader.mjs
+
+# Build outputs
+.next/
+out/
+dist/
+.turbo/
+.vercel/
+
+# Logs & diagnostics
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+coverage/
+
+# Editor directories
+.idea/
+.vscode/
+
+# Mac cache files
+.AppleDouble
+.LSOverride
+
+# Miscellaneous
+.npm/
+.cache/
+.parcel-cache/
+.sass-cache/
+.eslintcache

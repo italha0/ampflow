@@ -186,6 +186,7 @@ Available variables:
 ### Authentication
 - `GET /api/auth/connect/[platform]` - Initiate OAuth flow
 - `GET /api/auth/callback/[platform]` - Handle OAuth callback
+- `GET /api/auth/session` - Inspect the current Whop-provided session headers
 
 ### Connections
 - `GET /api/connections` - List user connections
@@ -259,6 +260,10 @@ The application is built with Next.js and can be deployed to any platform that s
   - Confirm `WHOP_API_KEY` is set and was generated with the "Experiences: Read" capability inside the Whop dashboard (Apps → API Keys)
   - Make sure the key belongs to the same company as the experience you are previewing
   - When running through the Whop local dev proxy, export the `WHOP_API_BASE` value shown in the CLI so requests route through the proxy; otherwise the page falls back to default copy
+6. **Auth Page Loops Inside Whop**
+  - The `/auth` route now waits for the Whop runtime to inject `x-whop-*` headers before redirecting to the dashboard
+  - If the spinner never resolves, click **Refresh session** to force a new check or use **Continue with Whop** to trigger the hosted sign-in
+  - When testing outside Whop, the page automatically kicks off the hosted login so you land back with the proper headers
 
 ### Support
 

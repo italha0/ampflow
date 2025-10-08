@@ -3,7 +3,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 interface ExperiencePass {
 	id: string;
@@ -202,23 +201,6 @@ async function getExperienceDetails(experienceId: string): Promise<ExperienceDet
 	return experienceCache.get(experienceId)!;
 }
 
-function formatPrice(pass: ExperiencePass): string {
-	if (typeof pass.price !== "number") {
-		return "Custom pricing";
-	}
-
-	try {
-		return new Intl.NumberFormat("en-US", {
-			style: "currency",
-			currency: pass.currency ?? "USD",
-		})
-			.format(pass.price)
-			.concat(pass.billingInterval ? ` / ${pass.billingInterval}` : "");
-	} catch {
-		return `$${pass.price.toFixed(2)}`.concat(pass.billingInterval ? ` / ${pass.billingInterval}` : "");
-	}
-}
-
 export async function generateMetadata({
 	params,
 }: {
@@ -254,8 +236,11 @@ export default async function ExperiencePage({
 				</header>
 
 				<main className="max-w-5xl mx-auto px-4 pb-24 space-y-12">
-					<Card className="bg-white/5 border-white/10 backdrop-blur-md">
-						<div className="grid gap-8 md:grid-cols-[2fr,1fr] p-8">
+					<Card
+						variant="flat"
+						containerClassName="bg-white/5 border border-white/10 backdrop-blur-md"
+					>
+						<div className="grid gap-8 p-8">
 							<div>
 								<h2 className="text-2xl font-semibold mb-4">What you get</h2>
 								<p className="text-white/70 leading-relaxed mb-6">{experience.description}</p>
@@ -268,36 +253,27 @@ export default async function ExperiencePage({
 									))}
 								</ul>
 							</div>
-							<div className="space-y-6">
-								<h3 className="text-xl font-semibold">Plans</h3>
-								<div className="space-y-4">
-									{experience.passes.map((pass) => (
-										<Card key={pass.id} className="bg-white/5 border-white/10">
-											<div className="p-5 space-y-3">
-												<div className="flex items-center justify-between">
-													<div>
-														<p className="text-lg font-semibold">{pass.name}</p>
-														<p className="text-sm text-white/60">{pass.description ?? "Includes full automation suite"}</p>
-													</div>
-													<Badge className="bg-gradient-to-r from-[#DD2F6E] to-[#f53c79] text-white border-none">
-														{formatPrice(pass)}
-													</Badge>
-												</div>
-												<Link href="/auth" className="block">
-													<Button className="w-full bg-white text-gray-900 hover:bg-white/90">
-														Start with this plan
-													</Button>
-												</Link>
-											</div>
-										</Card>
-									))}
-								</div>
+							<div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-white/70">
+								<h3 className="text-xl font-semibold text-white mb-3">Pricing update</h3>
+								<p>
+									We&rsquo;re reworking our plans and temporarily hiding pricing while we onboard early Whop partners. Existing
+									teams keep their current access, and new creators can join the waitlist for the next release.
+								</p>
+								<Button
+									disabled
+									className="mt-4 w-full bg-white/10 text-white opacity-60 cursor-not-allowed"
+								>
+									Waitlist opening soon
+								</Button>
 							</div>
 						</div>
 					</Card>
 
-					<Card className="bg-white/5 border-white/10 backdrop-blur-md p-8">
-						<div className="grid gap-8 md:grid-cols-2">
+					<Card
+						variant="flat"
+						containerClassName="bg-white/5 border border-white/10 backdrop-blur-md"
+					>
+						<div className="grid gap-8 md:grid-cols-2 p-8">
 							<div className="space-y-4">
 								<h3 className="text-xl font-semibold">Why creators choose AmpFlow</h3>
 								<p className="text-white/70">
@@ -317,11 +293,12 @@ export default async function ExperiencePage({
 									Whop experience in minutes.
 								</p>
 								<div className="flex flex-col sm:flex-row gap-3">
-									<Link href="/auth" className="flex-1">
-										<Button className="w-full bg-gradient-to-r from-[#DD2F6E] to-[#f53c79] hover:from-[#DD2F6E]/90 hover:to-[#f53c79]/90">
-											Open AmpFlow
-										</Button>
-									</Link>
+									<Button
+										disabled
+										className="flex-1 bg-gradient-to-r from-[#DD2F6E] to-[#f53c79] opacity-60 cursor-not-allowed"
+									>
+										Dashboard access via Whop only
+									</Button>
 									<Link href="/" className="flex-1">
 										<Button variant="outline" className="w-full border-white/40 text-white hover:bg-white/10">
 											Learn more

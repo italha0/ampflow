@@ -59,6 +59,7 @@
     --color-white: #fff;
     --spacing: 0.25rem;
     --container-md: 28rem;
+    --container-lg: 32rem;
     --container-2xl: 42rem;
     --container-3xl: 48rem;
     --container-4xl: 56rem;
@@ -521,6 +522,9 @@
   .max-w-6xl {
     max-width: var(--container-6xl);
   }
+  .max-w-lg {
+    max-width: var(--container-lg);
+  }
   .max-w-md {
     max-width: var(--container-md);
   }
@@ -791,9 +795,6 @@
   .bg-\[\#209F84\] {
     background-color: #209F84;
   }
-  .bg-\[\#5865F2\] {
-    background-color: #5865F2;
-  }
   .bg-\[\#F24242\] {
     background-color: #F24242;
   }
@@ -844,6 +845,9 @@
   }
   .bg-gray-800 {
     background-color: var(--color-gray-800);
+  }
+  .bg-gray-950 {
+    background-color: var(--color-gray-950);
   }
   .bg-green-100 {
     background-color: var(--color-green-100);
@@ -1334,13 +1338,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: #1a8069;
-      }
-    }
-  }
-  .hover\:bg-\[\#5865F2\]\/90 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: color-mix(in oklab, #5865F2 90%, transparent);
       }
     }
   }
