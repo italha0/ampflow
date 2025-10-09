@@ -1,17 +1,7 @@
 {
-<<<<<<< HEAD
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
   "outputDirectory": ".next"
 }
-=======
-  "crons": [
-    {
-      "path": "/api/jobs/process",
-      "schedule": "*/5 * * * *"
-    }
-  ]
-}
->>>>>>> 2833f3e098ddf8b7445210d2257d2d4d238b8235

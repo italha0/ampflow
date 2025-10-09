@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -144,9 +143,3 @@ export default function DashboardPage() {
     // </AuthGuard>
   );
 }
-=======
-import { redirect } from "next/navigation";
-export default function Home() {
-	redirect("/dashboard");
-}
->>>>>>> 2833f3e098ddf8b7445210d2257d2d4d238b8235
