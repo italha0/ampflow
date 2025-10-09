@@ -114,7 +114,7 @@ export default function AutomationsPage() {
   ];
 
   return (
-    <AuthGuard>
+    // <AuthGuard>
       <div className="flex h-screen bg-dark-950">
         <Sidebar />
 
@@ -249,6 +249,6 @@ export default function AutomationsPage() {
           </div>
         </main>
       </div>
-    </AuthGuard>
+    // </AuthGuard>
   );
 }

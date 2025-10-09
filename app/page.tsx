@@ -67,7 +67,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <AuthGuard>
+    // <AuthGuard>
       <div className="flex h-screen bg-dark-950">
         <Sidebar />
 
@@ -140,6 +140,6 @@ export default function DashboardPage() {
           </div>
         </main>
       </div>
-    </AuthGuard>
+    // </AuthGuard>
   );
 }
