@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -60,7 +59,7 @@ export function Sidebar() {
 			{/* Mobile Overlay */}
 			{isOpen && (
 				<div
-					className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden"
+					className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
 					onClick={() => setIsOpen(false)}
 				/>
 			)}
@@ -68,32 +67,31 @@ export function Sidebar() {
 			{/* Sidebar */}
 			<aside
 				className={cn(
-						"fixed top-0 left-0 h-screen bg-white/95 backdrop-blur border-r border-slate-200 shadow-[0_20px_45px_rgba(15,23,42,0.08)] z-50 transition-all duration-300",
+					"fixed top-0 left-0 h-screen bg-white border-r border-gray-a5 shadow-lg z-50 transition-all duration-300",
 					isOpen ? "w-64" : "w-20",
 					"lg:translate-x-0",
 					!isOpen && "lg:w-20"
 				)}
 			>
-					{/* Logo/Brand */}
-					<div className="relative flex items-center justify-between p-6 border-b border-slate-200">
+				{/* Logo/Brand */}
+				<div className="flex items-center justify-between p-6 border-b border-gray-a5">
 					{isOpen ? (
-							<div className="flex items-center gap-3">
-								<div className="relative h-10 w-10 overflow-hidden rounded-xl bg-slate-100">
-									<Image src="/logo.png" alt="AmpFlow" fill sizes="40px" className="object-contain" />
-								</div>
-								<div className="flex flex-col">
-									<span className="text-xl font-bold text-slate-900">AmpFlow</span>
-									<span className="text-xs font-medium text-slate-400">Creator Console</span>
-								</div>
+						<div className="flex items-center gap-2">
+							<div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white font-bold">
+								A
+							</div>
+							<span className="text-lg font-bold bg-gradient-to-r from-[#DD2F6E] to-[#f53c79] bg-clip-text text-transparent">
+								AmpFlow
+							</span>
 						</div>
 					) : (
-							<div className="relative mx-auto h-10 w-10 overflow-hidden rounded-xl bg-slate-100">
-								<Image src="/logo.png" alt="AmpFlow" fill sizes="40px" className="object-contain" />
-							</div>
+						<div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white font-bold mx-auto">
+							A
+						</div>
 					)}
 					<button
 						onClick={() => setIsOpen(!isOpen)}
-							className="hidden rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 lg:block"
+						className="p-2 rounded-lg hover:bg-gray-a3 transition-colors lg:block hidden"
 					>
 						<svg
 							width="20"
@@ -101,7 +99,7 @@ export function Sidebar() {
 							viewBox="0 0 24 24"
 							fill="none"
 							xmlns="http://www.w3.org/2000/svg"
-								className={cn("transition-transform text-slate-500", !isOpen && "rotate-180")}
+							className={cn("transition-transform", !isOpen && "rotate-180")}
 						>
 							<path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
 						</svg>
@@ -109,7 +107,7 @@ export function Sidebar() {
 				</div>
 
 				{/* Navigation */}
-					<nav className="p-4">
+				<nav className="p-4">
 					<ul className="space-y-2">
 						{navItems.map((item) => {
 							const isActive = pathname === item.href || pathname?.startsWith(item.href);
@@ -118,10 +116,10 @@ export function Sidebar() {
 									<Link
 										href={item.href}
 										className={cn(
-												"flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
+											"flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
 											isActive
-													? "bg-gradient-to-r from-[#6366f1] via-[#7c3aed] to-[#db2777] text-white shadow-[0_12px_30px_rgba(99,102,241,0.16)]"
-													: "text-slate-500 hover:bg-slate-100 hover:text-slate-900",
+												? "bg-gradient-to-r from-[#DD2F6E] to-[#bb1e57] text-white shadow-lg"
+												: "text-gray-a10 hover:bg-gray-a3 hover:text-[#DD2F6E]",
 											!isOpen && "justify-center"
 										)}
 									>
@@ -136,15 +134,15 @@ export function Sidebar() {
 
 				{/* User Profile Section */}
 				{isOpen && (
-						<div className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white/80 p-4 backdrop-blur">
-							<div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#6366f1] via-[#7c3aed] to-[#db2777] text-sm font-semibold text-white">
-									U
-								</div>
-								<div className="min-w-0 flex-1">
-									<p className="truncate text-sm font-semibold text-slate-900">User</p>
-									<p className="truncate text-xs text-slate-400">Plan: Premium</p>
-								</div>
+					<div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-a5">
+						<div className="flex items-center gap-3 p-3 rounded-lg bg-gray-a2">
+							<div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-white font-semibold">
+								U
+							</div>
+							<div className="flex-1 min-w-0">
+								<p className="text-sm font-semibold text-gray-12 truncate">User</p>
+								<p className="text-xs text-gray-a8 truncate">Plan: Premium</p>
+							</div>
 						</div>
 					</div>
 				)}
@@ -153,7 +151,7 @@ export function Sidebar() {
 			{/* Toggle button for mobile */}
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-					className="fixed bottom-4 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-[#6366f1] via-[#7c3aed] to-[#db2777] text-white shadow-xl lg:hidden"
+				className="fixed bottom-4 right-4 z-40 lg:hidden w-14 h-14 rounded-full gradient-primary text-white shadow-lg flex items-center justify-center"
 			>
 				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="currentColor"/>

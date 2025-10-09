@@ -1,3 +1,43 @@
 {
-    "projectId": "68e3b9ba0034add73ea0"
+    "projectId": "68e3b9ba0034add73ea0",
+    "functions": [
+        {
+            "$id": "68e7bb4d001323393968",
+            "name": "processJobs",
+            "runtime": "node-16.0",
+            "specification": "s-1vcpu-512mb",
+            "execute": [
+                "any"
+            ],
+            "events": [],
+            "scopes": [
+                "users.read"
+            ],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "src/main.js",
+            "commands": "npm install",
+            "path": "functions/processJobs"
+        },
+        {
+            "$id": "68e7991c003d7f58b1bb",
+            "execute": [
+                "any"
+            ],
+            "name": "youtubeWebhook",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
+            "scopes": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "entrypoint": "index.js",
+            "commands": "pnpm install && pnpm run build",
+            "specification": "s-0.5vcpu-512mb",
+            "path": "functions/youtubeWebhook"
+        }
+    ]
 }

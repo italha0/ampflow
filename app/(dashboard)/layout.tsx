@@ -3,9 +3,11 @@ import { Sidebar } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
 	return (
-		<div className="flex h-screen bg-gray-50">
+		<div className="flex min-h-screen bg-[#e9edf7]">
 			<Sidebar />
-			<main className="flex-1 overflow-y-auto">{children}</main>
+			<main className="ml-0 flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top_left,_#f6faff,_transparent_55%)] p-6 sm:p-10 lg:ml-64">
+				{children}
+			</main>
 		</div>
 	);
 }

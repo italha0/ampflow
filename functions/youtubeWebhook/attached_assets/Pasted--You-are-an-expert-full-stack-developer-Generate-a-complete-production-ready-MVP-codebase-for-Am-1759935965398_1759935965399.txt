@@ -1,0 +1,62 @@
+ You are an expert full-stack developer. Generate a complete, production-ready MVP codebase for **AmpFlow** — an automated content distributor for Whop creators.
+
+**High level**
+
+* Stack: Frontend **Next.js** using the **official Whop Next.js app template** + **Tailwind CSS** (dark theme; blue/purple accents). Backend & DB via **Appwrite Cloud**. Appwrite Functions (Node.js) for all server logic. Host frontend on **Vercel**.
+* MVP flow: User connects **YouTube** + community platforms (**Discord**, **Telegram**, **Whop**). When a new public YouTube video is published, detect via **PuSH webhook** → post a customizable announcement to selected communities.  
+
+**Appwrite DB (collections & minimal schema)** — enforce user-only read/write:
+
+* `connections`: `{ userId, platform(youtube|discord|telegram|whop), username, channelId, accessToken, refreshToken, botToken, guildId }`
+* `automations`: `{ userId, youtubeConnectionId, targetConnectionIds[], messageTemplate, isActive(Boolean) }`
+* `youtubeSubscriptions`: `{ youtubeChannelId (PK), callbackUrl, hubSecret, status(pending|subscribed|unsubscribed), expiryDate }`
+* Use Appwrite encryption for tokens/hubSecret and index channelId.
+
+**Appwrite Functions (Node.js)** — implement and document:
+
+1. `subscribeToYouTube` (HTTP POST)
+
+   * Input: `userId`, `youtubeChannelId`.
+   * Create secure `hubSecret`; build `hub.topic` (`https://www.youtube.com/xml/feeds/videos.xml?channel_id=...`) and `hub.callback` = public `youtubeWebhook` URL.
+   * POST to `https://pubsubhubbub.appspot.com/` to subscribe; store subscription doc with `status: pending`, `expiryDate`.
+   * Return success/failure.
+
+2. `youtubeWebhook` (Public HTTP GET/POST)
+
+   * **GET (verification):** read `hub.challenge`, parse `hub.topic` → find subscription; if valid return raw `hub.challenge` (200) and set `status: subscribed`.
+   * **POST (notification):**
+
+     * Receive raw XML body.
+     * Extract youtubeChannelId; retrieve stored `hubSecret`.
+     * **Verify `X-Hub-Signature`**: HMAC SHA1(raw body, hubSecret). Reject 403 on mismatch.
+     * Parse XML → extract `videoId`, `video_title`, `video_url`.
+     * Query `automations` where `youtubeConnectionId` matches and `isActive=true`. For each, call `distributeMessage` (internal Appwrite Function call) with `userId`, `messageTemplate`, `videoDetails`, `targetConnectionIds`.
+     * Return 200 immediately after processing.
+
+3. `distributeMessage` (internal)
+
+   * Inputs: `userId`, `messageTemplate`, `videoDetails`, `targetConnectionIds[]`.
+   * For each target connection:
+
+     * Fetch `connections` doc → platform, tokens, channelId/webhook.
+     * Replace placeholders `{{video_title}}`, `{{video_url}}`, `{{video_id}}`.
+     * **Discord:** post via Bot (or webhook URL), ensuring link preview; handle rate limits/errors.
+     * **Telegram:** Use Telegram Bot API to send a message.
+     * **Whop:** POST to placeholder Whop community API endpoint.
+   * Robust error handling, retries/logging, and return per-target status.
+
+**Frontend (exact pages & UX)** — built on Whop template; match provided visuals:
+
+* `/login`: centered email/password using Appwrite client SDK + AmpFlow logo.
+* `/` Dashboard/Connections: two-column layout with dark left sidebar (Dashboard, Automations, Settings). Cards for YouTube/Discord/Telegram/Whop showing status, connection/disconnection, and username.
+* `/automation`: Trigger: “WHEN a new video is posted to [YouTube channel]...”; Action: “…THEN post this message:”. Message editor (textarea) + placeholder list (`{{video_title}}`, `{{video_url}}`, `{{video_id}}`). Destination checkboxes, Master `Activate Automation` toggle, `Save Automation` button.
+* Use dark theme & blue/purple accents, responsive design, client-side validations.
+
+**Deliverables**
+
+* Full repo: frontend (Next.js Whop template) + Appwrite function code + DB init scripts / JSON schemas + CI instructions (Vercel + Appwrite env vars).
+* README with env vars, Appwrite collection definitions & rules, webhook URLs, and OAuth notes.
+* Unit tests for webhook signature verification and template rendering; integration test scripts for subscribe flow.
+* Security: never log secrets, store encrypted tokens, validate inputs, rate-limit or queue outgoing posts.
+
+Produce the codebase, schema export, and deployment instructions ready to run on Appwrite Cloud + Vercel.

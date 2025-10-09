@@ -1,0 +1,85 @@
+{
+  "projectId": "68e3b9ba0034add73ea0",
+  "projectName": "ampflow",
+  "version": "1.0.0",
+  "services": {
+    "functions": [
+      {
+        "$id": "subscribeToYouTube",
+        "name": "subscribeToYouTube",
+        "runtime": "node-20.0",
+        "entrypoint": "index.js",
+        "path": "appwrite-functions/subscribeToYouTube",
+  "commands": "corepack enable && pnpm install --no-frozen-lockfile || npm install",
+        "execute": ["role:users"],
+        "events": [],
+        "schedule": "",
+        "timeout": 900,
+        "vars": [
+          { "key": "APPWRITE_DATABASE_ID", "value": "68e3b9d6003bafa3dc5f" },
+          { "key": "APPWRITE_CONNECTIONS_COLLECTION_ID", "value": "connections" },
+          { "key": "APPWRITE_AUTOMATIONS_COLLECTION_ID", "value": "automations" },
+          { "key": "APPWRITE_YOUTUBE_SUBSCRIPTIONS_COLLECTION_ID", "value": "youtubeSubscriptions" },
+          { "key": "APPWRITE_API_KEY", "value": "<SET_IN_CONSOLE_OR_OVERRIDE_DURING_DEPLOY>" }
+        ]
+      },
+      {
+        "$id": "youtubeWebhook",
+        "name": "youtubeWebhook",
+        "runtime": "node-20.0",
+        "entrypoint": "index.js",
+        "path": "appwrite-functions/youtubeWebhook",
+  "commands": "corepack enable && pnpm install --no-frozen-lockfile || npm install",
+        "execute": ["role:all"],
+        "events": [],
+        "schedule": "",
+        "timeout": 900,
+        "vars": [
+          { "key": "APPWRITE_DATABASE_ID", "value": "68e3b9d6003bafa3dc5f" },
+          { "key": "APPWRITE_CONNECTIONS_COLLECTION_ID", "value": "connections" },
+          { "key": "APPWRITE_AUTOMATIONS_COLLECTION_ID", "value": "automations" },
+          { "key": "APPWRITE_YOUTUBE_SUBSCRIPTIONS_COLLECTION_ID", "value": "youtubeSubscriptions" },
+          { "key": "APPWRITE_API_KEY", "value": "<SET_IN_CONSOLE_OR_OVERRIDE_DURING_DEPLOY>" }
+        ]
+      },
+      {
+        "$id": "distributeMessage",
+        "name": "distributeMessage",
+        "runtime": "node-20.0",
+        "entrypoint": "index.js",
+        "path": "appwrite-functions/distributeMessage",
+  "commands": "corepack enable && pnpm install --no-frozen-lockfile || npm install",
+        "execute": ["role:system"],
+        "events": [],
+        "schedule": "",
+        "timeout": 900,
+        "vars": [
+          { "key": "APPWRITE_DATABASE_ID", "value": "68e3b9d6003bafa3dc5f" },
+          { "key": "APPWRITE_CONNECTIONS_COLLECTION_ID", "value": "connections" },
+          { "key": "APPWRITE_AUTOMATIONS_COLLECTION_ID", "value": "automations" },
+          { "key": "APPWRITE_YOUTUBE_SUBSCRIPTIONS_COLLECTION_ID", "value": "youtubeSubscriptions" },
+          { "key": "APPWRITE_API_KEY", "value": "<SET_IN_CONSOLE_OR_OVERRIDE_DURING_DEPLOY>" }
+        ]
+      },
+      {
+        "$id": "renewYouTubeSubscriptions",
+        "name": "renewYouTubeSubscriptions",
+        "runtime": "node-20.0",
+        "entrypoint": "index.js",
+        "path": "appwrite-functions/renewYouTubeSubscriptions",
+  "commands": "corepack enable && pnpm install --no-frozen-lockfile || npm install",
+        "execute": ["role:system"],
+        "events": [],
+        "schedule": "0 */12 * * *",
+        "timeout": 900,
+        "vars": [
+          { "key": "APPWRITE_DATABASE_ID", "value": "68e3b9d6003bafa3dc5f" },
+          { "key": "APPWRITE_CONNECTIONS_COLLECTION_ID", "value": "connections" },
+          { "key": "APPWRITE_AUTOMATIONS_COLLECTION_ID", "value": "automations" },
+          { "key": "APPWRITE_YOUTUBE_SUBSCRIPTIONS_COLLECTION_ID", "value": "youtubeSubscriptions" },
+          { "key": "APPWRITE_API_KEY", "value": "<SET_IN_CONSOLE_OR_OVERRIDE_DURING_DEPLOY>" }
+        ]
+      }
+    ]
+  }
+}

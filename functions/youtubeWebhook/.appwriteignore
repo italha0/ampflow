@@ -1,0 +1,12 @@
+# Ignore local/monorepo lockfiles that confuse Appwrite open-runtimes
+pnpm-lock.yaml
+**/pnpm-lock.yaml
+
+# Node artifacts not needed for deployment archives
+node_modules
+**/node_modules
+
+# VCS and editor files
+.git
+.gitignore
+.vscode

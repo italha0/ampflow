@@ -1,0 +1,10 @@
+{
+  "name": "processJobs",
+  "version": "1.0.0",
+  "description": "Process pending distribution jobs",
+  "main": "index.js",
+  "dependencies": {
+    "node-appwrite": "^12.0.0",
+    "axios": "^1.6.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "syncConnections",
+  "version": "1.0.0",
+  "description": "Sync and validate platform connections",
+  "main": "index.js",
+  "dependencies": {
+    "node-appwrite": "^12.0.0",
+    "axios": "^1.6.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "renew-youtube-subscriptions",
+  "version": "1.0.0",
+  "description": "Scheduled renewals for YouTube PuSH subscriptions",
+  "main": "index.js",
+  "dependencies": {
+    "node-appwrite": "^13.0.0",
+    "axios": "^1.7.9"
+  }
+}
